@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devCAT的技术&amp;生活感悟</title>
+    <description>与其把新技术挂在嘴边，不如把老掉牙的技术掌握在心间</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Mon, 19 Feb 2018 15:03:03 +0000</pubDate>
+    <lastBuildDate>Mon, 19 Feb 2018 15:03:03 +0000</lastBuildDate>
+    <generator>Jekyll v3.7.2</generator>
+    
+      <item>
+        <title>Hello World Jekyll Blog</title>
+        <description>&lt;h2 id=&quot;我的第一篇jekyll-blog&quot;&gt;我的第一篇jekyll blog&lt;/h2&gt;
+
+&lt;p&gt;仅仅是一篇测试博客，如果成功就要部署啦！&lt;/p&gt;
+</description>
+        <pubDate>Mon, 19 Feb 2018 14:45:00 +0000</pubDate>
+        <link>http://localhost:4000/2018/02/19/my-first-blog/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/02/19/my-first-blog/</guid>
+        
+        <category>test</category>
+        
+        
+      </item>
+    
+  </channel>
+</rss>
