@@ -10,9 +10,9 @@
     <meta name="keyword"  content="">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
-    <title>Hello World Jekyll Blog - 张叔阳的博客 | Zhang Shuyang's Blog</title>
+    <title>使用VPS搭建SS服务器频繁timed out的解决办法 - 张叔阳的博客 | Zhang Shuyang's Blog</title>
 
-    <link rel="canonical" href="http://localhost:4000/2018/02/19/my-first-blog/">
+    <link rel="canonical" href="http://localhost:4000/2018/02/20/solve-ss-timed-out-problem/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -140,15 +140,19 @@
                 <div class="post-heading">
                     <div class="tags">
                         
-                        <a class="tag" href="/tags/#test" title="test">test</a>
+                        <a class="tag" href="/tags/#shadowsocks" title="shadowsocks">shadowsocks</a>
+                        
+                        <a class="tag" href="/tags/#vps" title="vps">vps</a>
+                        
+                        <a class="tag" href="/tags/#iptables" title="iptables">iptables</a>
                         
                     </div>
-                    <h1>Hello World Jekyll Blog</h1>
+                    <h1>使用VPS搭建SS服务器频繁timed out的解决办法</h1>
                     
                     
-                    <h2 class="subheading"> "it is my first jekyll blog"</h2>
+                    <h2 class="subheading"> "shadowsocks真乃神器也！"</h2>
                     
-                    <span class="meta">Posted by Zhang Shuyang on February 19, 2018</span>
+                    <span class="meta">Posted by Zhang Shuyang on February 20, 2018</span>
                 </div>
             </div>
         </div>
@@ -166,9 +170,23 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-				<h2 id="我的第一篇jekyll-blog">我的第一篇jekyll blog</h2>
+				<h4 id="写在前面">写在前面</h4>
+<p>这篇文章是我2017年2月21日发表在新浪博客上的，此处仅为重发搬运。（新浪博客上共有三篇文章，这是第三篇，之后的文章都会直接发表在这里）</p>
 
-<p>仅仅是一篇测试博客，如果成功就要部署啦！</p>
+<h4 id="问题的原因">问题的原因</h4>
+<p>如果VPS选择的是CentOS 7.0以上的版本一般是因为centos防火墙默认对其他端口的规则导致的，iptables的默认规则是所有端口都关闭，因此才会出现频繁timed out的情况。</p>
+
+<h4 id="解决方案">解决方案</h4>
+<p>只需将SS的端口在防火墙中设置打开即可，代码如下（以6022端口为例）</p>
+
+<p><code class="highlighter-rouge">$ firewall-cmd --zone=public --add-port=6022/tcp --permanent</code><br />
+<code class="highlighter-rouge">$ firewall-cmd --zone=public --add-port=6022/udp --permanent</code><br />
+<code class="highlighter-rouge">$ firewall-cmd --complete-reload</code></p>
+
+<p>当然也可以直接把防火墙的所有规则都删掉，但是这显然是不安全的，不推荐这么做</p>
+
+<p><code class="highlighter-rouge">$ iptables -F</code></p>
+
 
 
                 <hr>
@@ -178,10 +196,10 @@
 
                 <ul class="pager">
                     
-                    
-                    <li class="next">
-                        <a href="/2018/02/19/how-to-install-arch-linux/" data-toggle="tooltip" data-placement="top" title="Arch Linux 装机全攻略">Next Post &rarr;</a>
+                    <li class="previous">
+                        <a href="/2018/02/20/add-https-using-letsencrypt/" data-toggle="tooltip" data-placement="top" title="使用letsencrypt给网站增加https证书">&larr; Previous Post</a>
                     </li>
+                    
                     
                 </ul>
 
@@ -262,8 +280,8 @@
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
 //    var disqus_shortname = "zhangshuyang";
-//    var disqus_identifier = "/2018/02/19/my-first-blog";
-//    var disqus_url = "http://localhost:4000/2018/02/19/my-first-blog/";
+//    var disqus_identifier = "/2018/02/20/solve-ss-timed-out-problem";
+//    var disqus_url = "http://localhost:4000/2018/02/20/solve-ss-timed-out-problem/";
 //
 //    (function() {
 //        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
@@ -271,8 +289,8 @@
 //       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 //    })();
         var disqus_config = function () {
-        this.page.url = "http://localhost:4000/2018/02/19/my-first-blog/";  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = "/2018/02/19/my-first-blog"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.url = "http://localhost:4000/2018/02/20/solve-ss-timed-out-problem/";  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = "/2018/02/20/solve-ss-timed-out-problem"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
 
         (function() { // DON'T EDIT BELOW THIS LINE

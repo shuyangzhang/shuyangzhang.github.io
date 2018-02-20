@@ -154,6 +154,85 @@
             ">
     			
 <div class="post-preview">
+    <a href="/2018/02/20/solve-ss-timed-out-problem/">
+        <h2 class="post-title">
+            使用VPS搭建SS服务器频繁timed out的解决办法
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "shadowsocks真乃神器也！"
+        </h3>
+        
+        <div class="post-content-preview">
+            写在前面
+这篇文章是我2017年2月21日发表在新浪博客上的，此处仅为重发搬运。（新浪博客上共有三篇文章，这是第三篇，之后的文章都会直接发表在这里）
+
+问题的原因
+如果VPS选择的是CentOS 7.0以上的版本一般是因为centos防火墙默认对其他端口的规则导致的，iptables的默认规则是所有端口都关闭，因此才会出现频繁timed out的情况。
+
+解决方案
+只需将SS的端口在防火墙中...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Zhang Shuyang on February 20, 2018
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2018/02/20/add-https-using-letsencrypt/">
+        <h2 class="post-title">
+            使用letsencrypt给网站增加https证书
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "已经2018年了，你还没使用https吗？"
+        </h3>
+        
+        <div class="post-content-preview">
+            写在最前
+
+这篇文章是我2016年12月12日发表在新浪博客上的，此处仅为重发搬运。（新浪博客上共有三篇文章，这是第二篇）
+
+前言
+
+最近刚刚租了aliyun服务器，第一次配置LNMP环境，遇到了很多关于nginx配置方面的问题（如为网站增加https证书），现在将解决这些问题时踩的一些坑和解决方法记录下来，一方面方便自己日后查阅，另一方面能给后来者一些参考。
+
+HTTPS的优势
+
+使用HT...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Zhang Shuyang on February 20, 2018
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2018/02/19/how-to-install-arch-linux/">
+        <h2 class="post-title">
+            Arch Linux 装机全攻略
+        </h2>
+        
+        <h3 class="post-subtitle">
+             "详细记录archlinux安装的每一步，linux零基础用户也看得懂"
+        </h3>
+        
+        <div class="post-content-preview">
+            0.前言
+
+本文最初写于2012年11月6日，发表在我的人人网主页，由于人人凉了，之后重新发表在了我的新浪博客上，这次是第三次重新发表了，因为我觉得 Jekyll+GitHub pages非常酷！以后的技术类博客和一些生活随想也会发表在这里。本文适合各类linux用户查看（从一无所知到高端），写作的主要目是对自己装Archlinux的过程进行记录，方便自己日后查阅，也方便其他喜欢linux或...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Zhang Shuyang on February 19, 2018
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
     <a href="/2018/02/19/my-first-blog/">
         <h2 class="post-title">
             Hello World Jekyll Blog
@@ -198,6 +277,28 @@
                         
                             
                         
+                            
+                                <a href="/tags/#Linux" title="Linux" rel="2">
+                                    Linux
+                                </a>
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
                     </div>
                 </section>
                 
@@ -228,7 +329,7 @@
                             
                             
                             <li>
-                                <a target="_blank" href="http://weibo.com/devCATs">
+                                <a target="_blank" href="http://weibo.com/devcat">
                                     <span class="fa-stack fa-lg">
                                         <i class="fa fa-circle fa-stack-2x"></i>
                                         <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
@@ -288,7 +389,7 @@
                     
                     
                     <li>
-                        <a target="_blank" href="http://weibo.com/devCATs">
+                        <a target="_blank" href="http://weibo.com/devcat">
                             <span class="fa-stack fa-lg">
                                 <i class="fa fa-circle fa-stack-2x"></i>
                                 <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
@@ -391,38 +492,9 @@
 
 <!-- Google Analytics -->
 
-<script>
-    // dynamic User by Hux
-    var _gaId = 'UA-49627206-1';
-    var _gaDomain = 'huangxuan.me';
-
-    // Originial
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', _gaId, _gaDomain);
-    ga('send', 'pageview');
-</script>
-
 
 
 <!-- Baidu Tongji -->
-
-<script>
-    // dynamic User by Hux
-    var _baId = '4cc1f2d8f3067386cc5cdb626a202900';
-
-    // Originial
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "//hm.baidu.com/hm.js?" + _baId;
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-</script>
 
 
 

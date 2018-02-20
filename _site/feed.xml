@@ -5,9 +5,525 @@
     <description>与其把新技术挂在嘴边，不如把老掉牙的技术掌握在心间</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Mon, 19 Feb 2018 15:12:32 +0000</pubDate>
-    <lastBuildDate>Mon, 19 Feb 2018 15:12:32 +0000</lastBuildDate>
+    <pubDate>Tue, 20 Feb 2018 23:38:13 +0000</pubDate>
+    <lastBuildDate>Tue, 20 Feb 2018 23:38:13 +0000</lastBuildDate>
     <generator>Jekyll v3.7.2</generator>
+    
+      <item>
+        <title>使用VPS搭建SS服务器频繁timed out的解决办法</title>
+        <description>&lt;h4 id=&quot;写在前面&quot;&gt;写在前面&lt;/h4&gt;
+&lt;p&gt;这篇文章是我2017年2月21日发表在新浪博客上的，此处仅为重发搬运。（新浪博客上共有三篇文章，这是第三篇，之后的文章都会直接发表在这里）&lt;/p&gt;
+
+&lt;h4 id=&quot;问题的原因&quot;&gt;问题的原因&lt;/h4&gt;
+&lt;p&gt;如果VPS选择的是CentOS 7.0以上的版本一般是因为centos防火墙默认对其他端口的规则导致的，iptables的默认规则是所有端口都关闭，因此才会出现频繁timed out的情况。&lt;/p&gt;
+
+&lt;h4 id=&quot;解决方案&quot;&gt;解决方案&lt;/h4&gt;
+&lt;p&gt;只需将SS的端口在防火墙中设置打开即可，代码如下（以6022端口为例）&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ firewall-cmd --zone=public --add-port=6022/tcp --permanent&lt;/code&gt;&lt;br /&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$ firewall-cmd --zone=public --add-port=6022/udp --permanent&lt;/code&gt;&lt;br /&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$ firewall-cmd --complete-reload&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;当然也可以直接把防火墙的所有规则都删掉，但是这显然是不安全的，不推荐这么做&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ iptables -F&lt;/code&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 20 Feb 2018 17:24:00 +0000</pubDate>
+        <link>http://localhost:4000/2018/02/20/solve-ss-timed-out-problem/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/02/20/solve-ss-timed-out-problem/</guid>
+        
+        <category>shadowsocks</category>
+        
+        <category>vps</category>
+        
+        <category>iptables</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>使用letsencrypt给网站增加https证书</title>
+        <description>&lt;h4 id=&quot;写在最前&quot;&gt;写在最前&lt;/h4&gt;
+
+&lt;p&gt;这篇文章是我2016年12月12日发表在新浪博客上的，此处仅为重发搬运。（新浪博客上共有三篇文章，这是第二篇）&lt;/p&gt;
+
+&lt;h4 id=&quot;前言&quot;&gt;前言&lt;/h4&gt;
+
+&lt;p&gt;最近刚刚租了aliyun服务器，第一次配置LNMP环境，遇到了很多关于nginx配置方面的问题（如为网站增加https证书），现在将解决这些问题时踩的一些坑和解决方法记录下来，一方面方便自己日后查阅，另一方面能给后来者一些参考。&lt;/p&gt;
+
+&lt;h4 id=&quot;https的优势&quot;&gt;HTTPS的优势&lt;/h4&gt;
+
+&lt;p&gt;使用HTTPS加密之后不仅能避免无良运营商对ISP的劫持，也能对传输内容进行加密，从某种层面来讲也能避免网络审查或被监听后的安全问题。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;以下是我的朋友awabimakoto对http与https的理解，仅供参考&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;http明文的话，中间人改了你也不知道。
+https密文的话，他就得伪造证书，这样浏览器会提示不受信任。(比如12306)
+可以制造自签名的证书，但没有权威机构认证，会不受信任。权威机构的密钥内置在浏览器中。
+目前提供免费证书的权威机构只有startcom和letsencrypt。（据我所知）可是startcom被中国沃通收购后名声一败涂地。
+自签名的证书可以测试用，用于生产是不好的。虽然偏偏有人这么干。(比如12306)
+关于网络审查方面，https避免了关键字过滤的审查方式。但是https并不能避免dns污染 ip封锁 ddos攻击等问题。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;https证书的选择&quot;&gt;HTTPS证书的选择&lt;/h4&gt;
+
+&lt;p&gt;提供证书的服务商有很多，大多都是收费的，我采用的是一家免费且靠谱的证书机构letsencrypt，官网：https://letsencrypt.org/ 证书免费使用三个月，快要到期的时候可以延长使用时间并且依然免费。
+该证书支持的浏览器有android2.3.6以上，firefox2.0以上，windows vista以上，ios3.1以上，chrome全平台。那么言外之意就是放弃了xp和ie7以下的用户，个人看来完全没问题。&lt;/p&gt;
+
+&lt;h4 id=&quot;流程&quot;&gt;流程&lt;/h4&gt;
+&lt;p&gt;分为三步：&lt;strong&gt;1.安装certbot  2.创建配置文件  3.让certbot自动更新证书&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1.安装certbot&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;certbot官网为：https://certbot.eff.org/  需要选择你的操作系统和http服务器，我这里用的是centos7.2+nginx，选择了对应的选项后会有匹配的指引参考：
+以下均以redhat系的yum包管理器为例&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ sudo yum install certbot&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.1创建配置文件&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ sudo certbot certonly&lt;/code&gt;
+随后是一段交互式的操作，无非就是输入域名和nginx里配置的wwwroot，随后该脚本会自动生成一个页面并检测该域名是否属于你，如果验证成功会自动生成一个目录和多个配置文件，目录为 /etc/letsencrypt/live/example.com/  生成的文件分别为 cert.pem privkey.pem chain.pem fullchain.pem&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.2配置nginx&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;利用mozilla提供的一个nginx配置文件自动生成工具可以快速生成配置文件，只需要改动部分内容即可，地址为：https://mozilla.github.io/server-side-tls/ssl-config-generator/  按照我的配置选择 Nginx+intermediate+server version 1.10.1 +openssl version 1.0.1e &lt;br /&gt;
+随后仅仅需要修改几处配置文件即可&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;server {  &lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;    listen 443 ssl http2;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;    ....&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;   ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;    ssl_dhparam /etc/nginx/ssl/dhparam.pem;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;    ssl_trusted_certificate /etc/letsencrypt/live/example.com/root_ca_cert_plus_intermediates;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;    resolver ;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;    ....&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;} &lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;ssl_sertificate 对应的是fullchain.pem  而 ssl_certificate_key对应 privkey.pem&lt;br /&gt;
+ssl_dhparam用linux自带的openssl生成即可&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ sudo mkdir /etc/nginx/ssl&lt;/code&gt;&lt;br /&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$ sudo openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;而ssl_trusted_certificate需要从letsencrypt上下载并且和自己chain.pem拼成&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ cd /etc/letsencrypt/live/example.com&lt;/code&gt;&lt;br /&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$ sudo wget https://letsencrypt.org/certs/isrgrootx1.pem&lt;/code&gt;&lt;br /&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$ sudo mv isrgrootx1.pem root.pem&lt;/code&gt;&lt;br /&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$ sudo cat root.pem chain.pem &amp;gt; root_ca_cert_plus_intermediates&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;而resolver只需填写服务器提供商的dns即可，比如阿里的223.6.6.6 223.7.7.7
+ok，Nginx配置成功，重启nginx服务&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ sudo service nginx restart&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3.让certbot自动更新证书&lt;/strong&gt;
+方法很多，这里使用的是cron的daily脚本来实现自动更新&lt;/p&gt;
+
+&lt;p&gt;在/etc/cron.daily目录下创建一个脚本，比如autocertbot.sh
+内容如下
+&lt;code class=&quot;highlighter-rouge&quot;&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/sh &lt;/span&gt;&lt;/code&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;certbot renew&lt;/code&gt;
+&lt;code class=&quot;highlighter-rouge&quot;&gt;service nginx restart&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;然后修改crontab的配置文件
+&lt;code class=&quot;highlighter-rouge&quot;&gt;$ sudo crontab -e&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;加入一行&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;40 4 * * * /etc/cron.daily/autocertbot.sh 2&amp;gt;&amp;amp;1 &amp;gt; /dev/null&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;即每天4点40分运行此脚本
+ok大功告成&lt;/p&gt;
+
+&lt;h4 id=&quot;一些有的没的&quot;&gt;一些有的没的&lt;/h4&gt;
+
+&lt;p&gt;1.在线工具测试服务器SSL安全性，一般A+证明没有问题  地址：
+&lt;a href=&quot;https://www.ssllabs.com/ssltest/index.html&quot;&gt;SSL Server Test&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;2.我的nginx配置文件，以便日后查看 地址：
+&lt;a href=&quot;https://github.com/shuyangzhang/nginx&quot;&gt;shuyangzhang@Github&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;3.本文的主要参考来源于 
+&lt;a href=&quot;https://ksmx.me/letsencrypt-ssl-https/&quot;&gt;letsencrypt-ssl-https&lt;/a&gt;
+感谢原作者的无私奉献，祝开源社区越来越好&lt;/p&gt;
+
+&lt;p&gt;4.最后祝你身体健康，再见！&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 20 Feb 2018 16:41:00 +0000</pubDate>
+        <link>http://localhost:4000/2018/02/20/add-https-using-letsencrypt/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/02/20/add-https-using-letsencrypt/</guid>
+        
+        <category>https</category>
+        
+        <category>nginx</category>
+        
+        <category>LNMP</category>
+        
+        <category>Linux</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Arch Linux 装机全攻略</title>
+        <description>&lt;h4 id=&quot;0前言&quot;&gt;0.前言&lt;/h4&gt;
+
+&lt;p&gt;本文最初写于2012年11月6日，发表在我的人人网主页，由于人人凉了，之后重新发表在了我的新浪博客上，这次是第三次重新发表了，因为我觉得 Jekyll+GitHub pages非常酷！以后的技术类博客和一些生活随想也会发表在这里。本文适合各类linux用户查看（从一无所知到高端），写作的主要目是对自己装Archlinux的过程进行记录，方便自己日后查阅，也方便其他喜欢linux或准备学习linux或者体验过其他发行版的linux的用户安装Archlinux时的参考。&lt;/p&gt;
+
+&lt;h4 id=&quot;1什么是linux&quot;&gt;1.什么是Linux？&lt;/h4&gt;
+
+&lt;p&gt;Linux是一种自由和开放源码的类Unix操作系统，存在着许多不同的Linux版本，但它们都使用了Linux内核。绝大多数服务器架设均使用Linux，其优点主要主要是免费，开源，安全，稳定，多平台。&lt;/p&gt;
+
+&lt;h4 id=&quot;2什么是archlinux&quot;&gt;2.什么是ArchLinux？&lt;/h4&gt;
+
+&lt;p&gt;Linux有很多发行版，比如大名鼎鼎的ubuntu和redhat，Arch是其中一种，Arch的设计思想是：简洁！Arch Linux 将简洁定义为：去除任何不必要的添加、修改和复杂，提供一个轻量级的类 Unix 系统，每个用户都可以以此为基础，打造出适合自己的系统。简而言之，即优雅、极简之道。一个新安装的 Arch Linux 系统仅包含基本的核心组件，不会执行任何自动配置。用户可以按自己意愿配置系统。从一开始，每个系统组件都可以很容易立即删除或者用其它组件替代。Arch Linux 软件仓库里大量的软件包也让你有更多的自由选择。仓库中既提供了开源、自由的软件，也提供了闭源软件给想使用它们的人。一切都由用户自己决定。正如 Arch Linux 项目的创立者 Judd Vinet 所说：“它（Arch）完全由你自己塑造而成。”&lt;/p&gt;
+
+&lt;h4 id=&quot;3我从未接触过linux系统可以配置属于自己的archlinux吗&quot;&gt;3.我从未接触过Linux系统，可以配置属于自己的ArchLinux吗？&lt;/h4&gt;
+
+&lt;p&gt;Arch是一个简单、轻量级、适合计算机水平较高用户使用的发行版。虽然这么说，但是绝不影响你将Arch作为你的第一个Linux发行版来安装。就Linux各个发行版的上手程度上来说，从简单到难顺序大致为：ubuntu，debian，fedora，redhat，SUSE，centOS，arch，slackware，gentoo。而且arch，slackware和gentoo的用户亲和力比较差，请做好心理准备，但是看了本帖相信就算你计算机水平较低也能顺利配置好你的Arch。&lt;/p&gt;
+
+&lt;h4 id=&quot;4安装一个archlinux大约需要多久&quot;&gt;4.安装一个ArchLinux大约需要多久？&lt;/h4&gt;
+
+&lt;p&gt;可以这么说，ArchLinxu大概就像一个空操场，安装时间要根据你准备安装什么设施决定，不过如果只想给操场上铺一层塑胶，安装一些简单的锻炼器材，大约只需要15-20分钟（当然要求你对linux命令和arch相对熟悉），如果完全零基础按照本帖来做，大约1小时即可完成。&lt;/p&gt;
+
+&lt;h4 id=&quot;5我可以安装archlinux和windows双系统吗&quot;&gt;5.我可以安装ArchLinux和Windows双系统吗？&lt;/h4&gt;
+
+&lt;p&gt;当然可以，我就是Arch+Win8+Win7三系统，没有任何问题，不过需要一些软件来实现，下文会提到。如果你实在害怕你把Windows玩坏的话，可以尝试安装虚拟机。（我在安装arch之前也是先在虚拟机上安装，然后在U盘上安装，后来尝试在硬盘上安装，其中硬盘安装前前后后反反复复安了3次，最后一次非常完美，用时20min。）&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;不多说废话了，切入正题。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;首先要明确Arch是基于网络安装的，请保证你的网络通畅（如果有ipv6更好，速度会更快）&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;1准备&quot;&gt;1.准备&lt;/h4&gt;
+
+&lt;p&gt;下载Arch的最新镜像并制作安装介质：Arch的官网archlinux.org右上角的download既可下载其最新iso镜像，并使用ultraliso等工具刻录到你的U盘/移动硬盘/光盘等硬件载体上，如果会使用虚拟光驱当然更好（由于制作安装介质属于准备工作因此不赘述，其方法与制作windows安装盘类似，可以直接百度iso安装盘制作指南）&lt;/p&gt;
+
+&lt;p&gt;准备一个硬盘分区用来安装Arch：制作分区可以用很多windows平台的软件，因此也不赘述了，不过需要提醒的是，linux的文件管理和windows不同，linux可以访问windows的硬盘分区而windows不能访问linux的硬盘分区，这一点请注意！因此一定要防止重要文件丢失，以免得不偿失。&lt;/p&gt;
+
+&lt;h4 id=&quot;2格式化分区&quot;&gt;2.格式化分区&lt;/h4&gt;
+
+&lt;p&gt;现在进入插上你刚制作好的安装介质（U盘/光盘/移动硬盘），重启计算机，如果是U盘或移动硬盘的话，需要改变BIOS从U盘/移动硬盘启动。方法为开机后按F12，然后选择你的介质，比如我用的是u盘，我就会看到一个kingston 8GB USB设备，然后点击，即可从U盘启动，这样我们就进入了安装arch的引导界面。&lt;/p&gt;
+
+&lt;p&gt;引导界面的第一条为安装64位arch，第二条为安装32位arch，选择前请一定确认你的CPU是否支持64位哦。选择后会引导安装界面（本质上是进入你安装介质的arch系统，在这个系统中安装你硬盘的arch），这是一个有点像dos的纯文本界面&lt;/p&gt;
+
+&lt;p&gt;可以先输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;fdisk /dev/sda &lt;/code&gt;      ##进入交互式界面&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;p&lt;/code&gt;                                           ##显示分区信息&lt;/p&gt;
+
+&lt;p&gt;这样会输出/dev/sda1  /dev/sda2  /dev/sda3等等的信息，这些sda x代表你硬盘的分区，后面显示的数字，例如/dev/sda1 56G 22G 35G 39% 代表sda1（一般对应你的C盘），共56G，已用22G，可用35G，已用39%&lt;/p&gt;
+
+&lt;p&gt;可以通过这些数据确定你之前准备好的硬盘分区是 sda几，以后就要格式化这块硬盘。记住之后输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;q&lt;/code&gt;                                           ##退出fdisk交互界面&lt;/p&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;mkfs.ext4 /dev/sdax&lt;/code&gt;      ##sdax中的x为对应数字，例如我就是sda6，这句话为以ext4形式格式化sda6硬盘&lt;/p&gt;
+
+&lt;h4 id=&quot;3挂载分区&quot;&gt;3.挂载分区&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;mount /dev/sdax /mnt &lt;/code&gt;       ##sdax中的x同上文，比如对我就是指把dev下的sda6分区挂载到mnt目录下&lt;/p&gt;
+
+&lt;h4 id=&quot;4更改网络镜像地址&quot;&gt;4.更改网络镜像地址&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;vi /etc/pacman.d/mirrorlist &lt;/code&gt;    ##找到中国的镜像地址，删除前面的两个#号，#号代表注释，删掉之后后面的内容就可以被执行了，类似于C++里的//,这里推荐mirror.163.com 和mirror.ustc.edu.cn分别是网易和中科大的镜像站点，网速较快，其实还有清华和北京交大的站点，速度都不是很快，因此不推荐了。具体删除的方法是光标找到那行，按i进入编辑模式，然后按del键删掉，然后输入：wq回车即可退出编辑模式。&lt;/p&gt;
+
+&lt;h4 id=&quot;5安装基本系统&quot;&gt;5.安装基本系统&lt;/h4&gt;
+
+&lt;p&gt;输入
+&lt;code class=&quot;highlighter-rouge&quot;&gt;pacstrap /mnt base base-devel&lt;/code&gt;    ##安装最基本的Arch系统，即文字界面（类似与现在你所在的环境，其实现在所处的安装环境就是一个基本的arch系统，只不过是安装在你的U盘/移动硬盘/光盘上而已）&lt;/p&gt;
+
+&lt;h4 id=&quot;6配置系统&quot;&gt;6.配置系统&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;genfstab -p /mnt &amp;gt;&amp;gt; /mnt/etc/fstab&lt;/code&gt;            ##这里牵扯到一个重定向的管道»，如果你懂C++可以理解为C++里的流（其实就是嘛，linux就是用C写的。。。。）（比如C++中的I/O流 cin cout）&lt;/p&gt;
+
+&lt;h4 id=&quot;7拷贝一下镜像设置&quot;&gt;7.拷贝一下镜像设置&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/&lt;/code&gt;     ##解释下这步，就是说刚才第4部其实改的是你的U盘或光盘里那个Arch系统（安装环境）的镜像设置，现在拷贝到的目录是你已经装好的硬盘里的Arch系统的目录，这样一会进入你安好的系统中就不用再设置啦&lt;/p&gt;
+
+&lt;h4 id=&quot;8切换根目录&quot;&gt;8.切换根目录&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;arch-chroot /mnt&lt;/code&gt;               ##刚才你的根目录在u盘或光盘的Arch系统下，现在相当于切换到硬盘你刚才安装好的arch系统下&lt;/p&gt;
+
+&lt;h4 id=&quot;9选择需要的字库并安装&quot;&gt;9.选择需要的字库并安装&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;vi /etc/locale.gen &lt;/code&gt;         ##找到en-US（英语的）和zh-CN（中文的）开头的内容，删除前面的##，方法同第4步&lt;/p&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;locale-gen  &lt;/code&gt;      ##即安装你刚才选好的英语和中文字库&lt;/p&gt;
+
+&lt;h4 id=&quot;10重启&quot;&gt;10.重启&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;reboot &lt;/code&gt;      ##刚才几步之后，我们的Arch系统已经算是安好到你的硬盘里了，不过别着急，这个系统才是个框架，只有文字界面，就好比前文说的空操场，现在我们要做的是给他铺塑胶，并且设置基本的运动器材！&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;重启后，你会发现你进入了你的windows！而且系统根本没有提示让你选择进入windows还是arch，你可以会怀疑刚才真的装好了一个archlinux？是的，只是我们没有改引导区，也就是说你的计算机不知道你还有一个Arch系统，现在我们要做的就是通过grub来引导进入你的Arch（说白了，就是实现双系统！）&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;11grub设置&quot;&gt;11.Grub设置&lt;/h4&gt;
+
+&lt;p&gt;Arch官方WIKI上提供了Grub2和EFI引导的方式，这里提供一种最简单易行的方式，通过windows平台的软件EasyBCD实现。&lt;/p&gt;
+
+&lt;p&gt;方法大致为，下载并安装EasyBCD，英语不好的同学可以装汉化版的。运行EasyBCD，选择‘添加新条目‘，选择‘NeoGrub’，选择‘添加’，这是C盘根目录下会多一个‘NST’的文件夹，内有2个文件‘menu.list’’NeoGrub.mbr’,这时用文本编辑器编辑menu.list文件，添加&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;root (hd0,x-1)&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;kernel /boot/vmlinuz-linux root=/dev/sdax ro&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;initrd /boot/initramfs-linux.img&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;boot&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;解释一下第一行的x-1就是你第2步sdax里的x－1，为什么－1呢，因为他是从0开始排的，比如我就是root(hd0,5)&lt;/p&gt;
+
+&lt;p&gt;第二行的x就是刚才的x，比如我是sda6。&lt;/p&gt;
+
+&lt;p&gt;编辑好之后保存，重启计算机，这样开机就会提示你进Arch了～，选择Arch进入&lt;/p&gt;
+
+&lt;h4 id=&quot;12设置主机名并添加用户&quot;&gt;12.设置主机名并添加用户&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;echo 'pcname' &amp;gt;&amp;gt; /etc/hostname   &lt;/code&gt;       ##这里的pcname里就写你要给计算机起的名字,比如我就给计算机叫pc那么就是echo ‘pc’ » /etc/hostname&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;adduser user    &lt;/code&gt;       ##这里的user就是你想创建的用户名.比如我的叫arch,那么就是adduser arch.这一步是交互式的,系统会提示你设置一些东西,包括密码,跟着一步一步填就OK,这里不赘述了&lt;/p&gt;
+
+&lt;h4 id=&quot;13配置网络&quot;&gt;13.配置网络&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ip link set eth0 up&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;dhcpcd eth0   &lt;/code&gt;                    ##这两步就是强制联网,因为之后要下载一些网络文件,并且设置成开机自动联网,因此这几步以后在也不用重复作了&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;pacman -S ifplugd&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;cd /etc/network.d&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ln -s examples/ethernet-dhcp .    &lt;/code&gt; ##注意后面有个空格和点,别忘了.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;systemctl enable net-auto-wired.service &lt;/code&gt;  ##这一步就是把开启以太网卡做成开机启动模块,以后会自动联网&lt;/p&gt;
+
+&lt;h4 id=&quot;14下载sudo并且设置权限和密码&quot;&gt;14.下载sudo并且设置权限和密码&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;pacman -S sudo    &lt;/code&gt;         ##不解释了，Arch的包管理器pacman，－S是下载并安装&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;chmod +w /etc/sudoers  &lt;/code&gt;        ##给sudoer这个文件增加可写权限&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;vi /etc/sudoers    &lt;/code&gt;          ##和前文几步很像,用vi编辑这个文件,找到root ALL=(ALL) ALL这一行,给这行后面添加一行user ALL=NOPASSWD: ALL 注意这个user是第12步你创建的用户名称,比如我创建的叫arch,那么这行就是arch ALL=NOPASSWD: ALL&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;chmod -w /etc/sudoers   &lt;/code&gt;            ##不解释了,改完之后再把他的可写权限去掉&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;到此为止,你的空操场算是铺设好了,不过现在还是文字界面,没有桌面环境和窗口管理器,这些都习都可以自己定制,所以这也体现了Arch简洁的特点,其系统根本不内置任何个性化的东西,个性化的东西都由用户来配置,下文推荐一下一种轻量级的桌面环境lxde,不过linux平台最有名的桌面环境是gnome和kde,这两个桌面环境非常漂亮,后面后介绍如何装这两种,这里先谈轻量级的lxde.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;15下载并安装xorg&quot;&gt;15.下载并安装xorg&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils mesa alsa-utils&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;16下载显卡驱动&quot;&gt;16.下载显卡驱动&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;pacman -S xf86-video-intel xf86-video-nouveau &lt;/code&gt;    ##注,xf86-video-noveau是N卡的开源驱动,如果你的PC是A卡的,请把这个改成xf86-video-ati,如果只有intel集成显卡,就只下载xf86-video-intel,对于兼容机没有intel集成显卡的用户下载对应的N卡或A卡驱动即可&lt;/p&gt;
+
+&lt;h4 id=&quot;17其他驱动字体&quot;&gt;17.其他驱动,字体&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;pacman -S xf86-input-synaptics ttf-dejavu wqy-zenhei&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;18下载桌面环境lxde&quot;&gt;18.下载桌面环境(lxde)&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;pacman -S lxde obconf gamin&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;19退出root登录进入你的用户登录前面几步一直在root下进行的&quot;&gt;19.退出root登录,进入你的用户登录(前面几步一直在root下进行的)&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;exit &lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;这是系统会出现login:然后输入你刚创建的用户名和密码,比如我就输入arch回车 密码回车&lt;/p&gt;
+
+&lt;p&gt;这时候你会发现你输入命令的前面从刚才的root@pcname变成了user@pcname(比如我arch@pc)&lt;/p&gt;
+
+&lt;h4 id=&quot;20设置openbox和lxde&quot;&gt;20.设置openbox和lxde&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;mkdir -p .config/openbox    &lt;/code&gt;          ##注意config前面有个点&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;cp /etc/xdg/openbox/{menu.xml,rc.xml,autostart} .config/openbox  &lt;/code&gt;       ##注意花括号里的点和逗号别弄错了&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;echo 'exec startlxde' &amp;gt; .xinitrc   &lt;/code&gt;          ##注意xinitrc前面有个点&lt;/p&gt;
+
+&lt;h4 id=&quot;21进入桌面环境图形界面&quot;&gt;21.进入桌面环境(图形界面)&lt;/h4&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;startx&lt;/code&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;OK,经过21步的长途跋涉和设置,我们终于进到了图形界面中!后面的配置就会更简单,看到这么一个完全由自己配置的图形环境,虽然前面过程很麻烦,不过很有成就感哈!~&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;22设置语言需要root登录root登录的方法是在终端中输入sudo-su&quot;&gt;22.设置语言(需要root登录,root登录的方法是在终端中输入sudo su)&lt;/h4&gt;
+
+&lt;p&gt;进到图形界面里,点击左下角的按钮(类似windows里的开始),选择’附件’,’LX终端’,这也就是我们常说的terminal,有点像windows里的cmd,不过这个功能无比强大,完爆cmd&lt;/p&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo su  &lt;/code&gt;    ##root登录,之所以不直接在后面的命令前面加sudo是因为sudo+命令的权限和root登录有一点区别,更改语言sudo权限不够,必须root登录&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;echo &quot;LANG=zh_CN=UTF-8&quot; &amp;gt; /etc/locale.conf&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;23设置为开机登录后自动进入图形界面需要root登录&quot;&gt;23.设置为开机登录后自动进入图形界面(需要root登录)&lt;/h4&gt;
+
+&lt;p&gt;可以直接在刚才的终端中继续输入(也可以再打开一个然后sudo su)&lt;/p&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;echo 'startx' &amp;gt;&amp;gt; /etc/profile&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;24设置中文输入法&quot;&gt;24.设置中文输入法&lt;/h4&gt;
+
+&lt;p&gt;重新打开一个终端(因为不需要root登录,只是需要sudo权限)&lt;/p&gt;
+
+&lt;p&gt;输入&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo pacman -S scim scim-pinyin&lt;/code&gt;     ##其中scim-pinyin是拼音输入法,习惯使用五笔的同学把这个改为scim-tables&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;vi .xinitrc  &lt;/code&gt;             ##编辑.xinitrc,你会发现里面有一行exec startlxde,对,这句话是刚才咱们加进去的,给他前面加5行内容export LC_CTYPE=”zh_CN.UTF-8” 回车 export XMODIFIERS=@im=SCIM 回车export GTK_IM_MODULE=”scim” 回车export QT_IM_MODULE=”scim” 回车scim -d ,重启之后会生效,切换的默认热键是ctrl+space,这个可以用户根据自己习惯再改&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;好了,到此位置,我们的操场上的塑胶和基本的运动设施全部搭载完毕,后面的软件什么的就完全有用户你去定制咯!这样才是属于你的系统,这里会推荐一些软件,下载方法就是”sudo pacman -S 软件名”,非常简单!&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;输入法&lt;/strong&gt;:ibus(刚我们装的是scim,不喜欢的话可以换成ibus)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;web浏览器&lt;/strong&gt;:firefox  chrome  opera&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Email客户端&lt;/strong&gt;:thunderbird  kmail&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;文案工作&lt;/strong&gt;:libreoffice  koffice  wpsforlinux&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;文本编辑&lt;/strong&gt;:gvim(就是我们刚一直用的vi的升级版)  gedit(推荐)  editor&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;PDF阅读器&lt;/strong&gt;:kpdf  adobereader(这个是闭源软件,因此不推荐)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;字典&lt;/strong&gt;:goldendict  stardict&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;CAD软件&lt;/strong&gt;:draftsight(只支持2D,不过用起来和autoCAD很像,推荐)  freeCAD(支持3D,推荐)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;音乐播放器&lt;/strong&gt;:rhythmbox(推荐)  amarok  exaile&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;视频播放器&lt;/strong&gt;:kaffeine(推荐)  vlc(支持硬解码)  realplayer&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;开发环境&lt;/strong&gt;:gcc(这个名气太大不说了,不过只能用C和C++)  kdevelop4(支持多种语言,推荐)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;游戏&lt;/strong&gt;:大名鼎鼎的doom3有linux平台的.还有一条消息”Steam重申对Linux系统的重视，疏远苹果和微软系统,Valve是真的很讨厌Windows 8，他们对微软操作系统的炮轰从未停止，对苹果Itunes的炮轰也是一样了。如你所知，苹果和微软都基本上全权控制着自己的操作系统和对应的App Store，而Steam不会这么做。Steam表示:我们要继续对开放平台的开发，我们发现很显然Linux是最具灵活性的平台，所以我们现在正在努力尽可能让Steam在Linux下支持更多游戏。我们想消除Linux与玩家之间的最大隔阂，让这个开源平台继续生存。如果微软最后变得和苹果一样，成了全封闭式的系统，那Linux无疑就将成为人们最好的选择了。所以我们要尽所能完善它。”什么?你不知道Steam公司.CS你玩过把?上面写的啥?&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;现写到这里吧,如果你感觉刚才那个图形界面不好看,太屌丝(因为是一个轻量级的桌面环境,因此不是很华丽),你可以尝试安装gnome或者kde,这两个非常漂亮,具体教程正在编辑中,稍等…………&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;附录一些TIPS&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;如果你是给笔记本上装ArchLinux，那么自然少不了触摸板和音量热键的设置（亮度设置内置于BIOS因此不用设置）&lt;/p&gt;
+
+&lt;h4 id=&quot;1触摸板设置&quot;&gt;1.触摸板设置&lt;/h4&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo vi /etc/X11/xorg.conf.d/10-synaptics.conf   &lt;/code&gt;              ##用vi编辑配置文件&lt;/p&gt;
+
+&lt;p&gt;本身的内容中几行&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Option &quot;TapButton1&quot; &quot;1&quot;       &lt;/code&gt;           ##保持这行不变&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Option &quot;TapButton2&quot; &quot;2&quot;       &lt;/code&gt;           ##这行说的是两指触控 后面的参数”2”为开,若要关闭改为”0”&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Option &quot;TapButton3&quot; &quot;3&quot;       &lt;/code&gt;           ##同理三指触控开关 开为”3”,关为”0”&lt;/p&gt;
+
+&lt;p&gt;给这几行下面加这么几行&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Option &quot;VertEdgeScroll&quot; &quot;on&quot;     &lt;/code&gt;             ##竖直方向右侧栏滚动开关   “on”为开,若要关闭改为”off”&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Option &quot;VertTwoFingerScroll&quot; &quot;on&quot;     &lt;/code&gt;          ##竖直方向双指滚动开关  同理”on”为开,”off”为关&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Option &quot;HorizEdgeScroll&quot; &quot;on&quot;         &lt;/code&gt;          ##同理,水平方向的下侧栏滚动开关&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Option &quot;HorizTwoFingerScroll&quot; &quot;on&quot;    &lt;/code&gt;               ##同理,水平方向双指滚动开关&lt;/p&gt;
+
+&lt;h4 id=&quot;2键盘控制音量音量热键&quot;&gt;2.键盘控制音量(音量热键)&lt;/h4&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;vi .config/openbox/lxde-rc.xml   &lt;/code&gt;    ##用vi编辑热键配置文件&lt;/p&gt;
+
+&lt;p&gt;找到文件的断 添加如下代码&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;amixer set Master 5%+ amixer set Master 5%-   &lt;/code&gt;
+这些代码分别代表windows键+上键调高5%音量,windows键+下键降低5%音量&lt;/p&gt;
+
+&lt;p&gt;如果你的笔记本有额外的热键专门控制音量和静音,可以直接将下面代码添加进配置文件&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;amixer set Master 5%+ unmute &lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;amixer set Master 5%- unmute &lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;amixer set Master toggle &lt;/code&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 19 Feb 2018 19:12:00 +0000</pubDate>
+        <link>http://localhost:4000/2018/02/19/how-to-install-arch-linux/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/02/19/how-to-install-arch-linux/</guid>
+        
+        <category>Linux</category>
+        
+        <category>Arch</category>
+        
+        <category>ArchLinux</category>
+        
+        
+      </item>
     
       <item>
         <title>Hello World Jekyll Blog</title>

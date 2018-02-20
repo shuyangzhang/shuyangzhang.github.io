@@ -10,9 +10,9 @@
     <meta name="keyword"  content="">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
-    <title>Hello World Jekyll Blog - 张叔阳的博客 | Zhang Shuyang's Blog</title>
+    <title>使用letsencrypt给网站增加https证书 - 张叔阳的博客 | Zhang Shuyang's Blog</title>
 
-    <link rel="canonical" href="http://localhost:4000/2018/02/19/my-first-blog/">
+    <link rel="canonical" href="http://localhost:4000/2018/02/20/add-https-using-letsencrypt/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -140,15 +140,21 @@
                 <div class="post-heading">
                     <div class="tags">
                         
-                        <a class="tag" href="/tags/#test" title="test">test</a>
+                        <a class="tag" href="/tags/#https" title="https">https</a>
+                        
+                        <a class="tag" href="/tags/#nginx" title="nginx">nginx</a>
+                        
+                        <a class="tag" href="/tags/#LNMP" title="LNMP">LNMP</a>
+                        
+                        <a class="tag" href="/tags/#Linux" title="Linux">Linux</a>
                         
                     </div>
-                    <h1>Hello World Jekyll Blog</h1>
+                    <h1>使用letsencrypt给网站增加https证书</h1>
                     
                     
-                    <h2 class="subheading"> "it is my first jekyll blog"</h2>
+                    <h2 class="subheading"> "已经2018年了，你还没使用https吗？"</h2>
                     
-                    <span class="meta">Posted by Zhang Shuyang on February 19, 2018</span>
+                    <span class="meta">Posted by Zhang Shuyang on February 20, 2018</span>
                 </div>
             </div>
         </div>
@@ -166,9 +172,125 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-				<h2 id="我的第一篇jekyll-blog">我的第一篇jekyll blog</h2>
+				<h4 id="写在最前">写在最前</h4>
 
-<p>仅仅是一篇测试博客，如果成功就要部署啦！</p>
+<p>这篇文章是我2016年12月12日发表在新浪博客上的，此处仅为重发搬运。（新浪博客上共有三篇文章，这是第二篇）</p>
+
+<h4 id="前言">前言</h4>
+
+<p>最近刚刚租了aliyun服务器，第一次配置LNMP环境，遇到了很多关于nginx配置方面的问题（如为网站增加https证书），现在将解决这些问题时踩的一些坑和解决方法记录下来，一方面方便自己日后查阅，另一方面能给后来者一些参考。</p>
+
+<h4 id="https的优势">HTTPS的优势</h4>
+
+<p>使用HTTPS加密之后不仅能避免无良运营商对ISP的劫持，也能对传输内容进行加密，从某种层面来讲也能避免网络审查或被监听后的安全问题。</p>
+
+<p><strong>以下是我的朋友awabimakoto对http与https的理解，仅供参考</strong></p>
+
+<blockquote>
+  <p>http明文的话，中间人改了你也不知道。
+https密文的话，他就得伪造证书，这样浏览器会提示不受信任。(比如12306)
+可以制造自签名的证书，但没有权威机构认证，会不受信任。权威机构的密钥内置在浏览器中。
+目前提供免费证书的权威机构只有startcom和letsencrypt。（据我所知）可是startcom被中国沃通收购后名声一败涂地。
+自签名的证书可以测试用，用于生产是不好的。虽然偏偏有人这么干。(比如12306)
+关于网络审查方面，https避免了关键字过滤的审查方式。但是https并不能避免dns污染 ip封锁 ddos攻击等问题。</p>
+</blockquote>
+
+<h4 id="https证书的选择">HTTPS证书的选择</h4>
+
+<p>提供证书的服务商有很多，大多都是收费的，我采用的是一家免费且靠谱的证书机构letsencrypt，官网：https://letsencrypt.org/ 证书免费使用三个月，快要到期的时候可以延长使用时间并且依然免费。
+该证书支持的浏览器有android2.3.6以上，firefox2.0以上，windows vista以上，ios3.1以上，chrome全平台。那么言外之意就是放弃了xp和ie7以下的用户，个人看来完全没问题。</p>
+
+<h4 id="流程">流程</h4>
+<p>分为三步：<strong>1.安装certbot  2.创建配置文件  3.让certbot自动更新证书</strong></p>
+
+<p><strong>1.安装certbot</strong></p>
+
+<p>certbot官网为：https://certbot.eff.org/  需要选择你的操作系统和http服务器，我这里用的是centos7.2+nginx，选择了对应的选项后会有匹配的指引参考：
+以下均以redhat系的yum包管理器为例</p>
+
+<p><code class="highlighter-rouge">$ sudo yum install certbot</code></p>
+
+<p><strong>2.1创建配置文件</strong></p>
+
+<p><code class="highlighter-rouge">$ sudo certbot certonly</code>
+随后是一段交互式的操作，无非就是输入域名和nginx里配置的wwwroot，随后该脚本会自动生成一个页面并检测该域名是否属于你，如果验证成功会自动生成一个目录和多个配置文件，目录为 /etc/letsencrypt/live/example.com/  生成的文件分别为 cert.pem privkey.pem chain.pem fullchain.pem</p>
+
+<p><strong>2.2配置nginx</strong></p>
+
+<p>利用mozilla提供的一个nginx配置文件自动生成工具可以快速生成配置文件，只需要改动部分内容即可，地址为：https://mozilla.github.io/server-side-tls/ssl-config-generator/  按照我的配置选择 Nginx+intermediate+server version 1.10.1 +openssl version 1.0.1e <br />
+随后仅仅需要修改几处配置文件即可</p>
+
+<p><code class="highlighter-rouge">server {  </code></p>
+
+<p><code class="highlighter-rouge">    listen 443 ssl http2;</code></p>
+
+<p><code class="highlighter-rouge">    ....</code></p>
+
+<p><code class="highlighter-rouge">    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;</code></p>
+
+<p><code class="highlighter-rouge">   ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;</code></p>
+
+<p><code class="highlighter-rouge">    ssl_dhparam /etc/nginx/ssl/dhparam.pem;</code></p>
+
+<p><code class="highlighter-rouge">    ssl_trusted_certificate /etc/letsencrypt/live/example.com/root_ca_cert_plus_intermediates;</code></p>
+
+<p><code class="highlighter-rouge">    resolver ;</code></p>
+
+<p><code class="highlighter-rouge">    ....</code></p>
+
+<p><code class="highlighter-rouge">} </code></p>
+
+<p>ssl_sertificate 对应的是fullchain.pem  而 ssl_certificate_key对应 privkey.pem<br />
+ssl_dhparam用linux自带的openssl生成即可</p>
+
+<p><code class="highlighter-rouge">$ sudo mkdir /etc/nginx/ssl</code><br />
+<code class="highlighter-rouge">$ sudo openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048</code></p>
+
+<p>而ssl_trusted_certificate需要从letsencrypt上下载并且和自己chain.pem拼成</p>
+
+<p><code class="highlighter-rouge">$ cd /etc/letsencrypt/live/example.com</code><br />
+<code class="highlighter-rouge">$ sudo wget https://letsencrypt.org/certs/isrgrootx1.pem</code><br />
+<code class="highlighter-rouge">$ sudo mv isrgrootx1.pem root.pem</code><br />
+<code class="highlighter-rouge">$ sudo cat root.pem chain.pem &gt; root_ca_cert_plus_intermediates</code></p>
+
+<p>而resolver只需填写服务器提供商的dns即可，比如阿里的223.6.6.6 223.7.7.7
+ok，Nginx配置成功，重启nginx服务</p>
+
+<p><code class="highlighter-rouge">$ sudo service nginx restart</code></p>
+
+<p><strong>3.让certbot自动更新证书</strong>
+方法很多，这里使用的是cron的daily脚本来实现自动更新</p>
+
+<p>在/etc/cron.daily目录下创建一个脚本，比如autocertbot.sh
+内容如下
+<code class="highlighter-rouge"><span class="c">#!/bin/sh </span></code>
+<code class="highlighter-rouge">certbot renew</code>
+<code class="highlighter-rouge">service nginx restart</code></p>
+
+<p>然后修改crontab的配置文件
+<code class="highlighter-rouge">$ sudo crontab -e</code></p>
+
+<p>加入一行</p>
+
+<p><code class="highlighter-rouge">40 4 * * * /etc/cron.daily/autocertbot.sh 2&gt;&amp;1 &gt; /dev/null</code></p>
+
+<p>即每天4点40分运行此脚本
+ok大功告成</p>
+
+<h4 id="一些有的没的">一些有的没的</h4>
+
+<p>1.在线工具测试服务器SSL安全性，一般A+证明没有问题  地址：
+<a href="https://www.ssllabs.com/ssltest/index.html">SSL Server Test</a></p>
+
+<p>2.我的nginx配置文件，以便日后查看 地址：
+<a href="https://github.com/shuyangzhang/nginx">shuyangzhang@Github</a></p>
+
+<p>3.本文的主要参考来源于 
+<a href="https://ksmx.me/letsencrypt-ssl-https/">letsencrypt-ssl-https</a>
+感谢原作者的无私奉献，祝开源社区越来越好</p>
+
+<p>4.最后祝你身体健康，再见！</p>
+
 
 
                 <hr>
@@ -178,9 +300,13 @@
 
                 <ul class="pager">
                     
+                    <li class="previous">
+                        <a href="/2018/02/19/how-to-install-arch-linux/" data-toggle="tooltip" data-placement="top" title="Arch Linux 装机全攻略">&larr; Previous Post</a>
+                    </li>
+                    
                     
                     <li class="next">
-                        <a href="/2018/02/19/how-to-install-arch-linux/" data-toggle="tooltip" data-placement="top" title="Arch Linux 装机全攻略">Next Post &rarr;</a>
+                        <a href="/2018/02/20/solve-ss-timed-out-problem/" data-toggle="tooltip" data-placement="top" title="使用VPS搭建SS服务器频繁timed out的解决办法">Next Post &rarr;</a>
                     </li>
                     
                 </ul>
@@ -262,8 +388,8 @@
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
 //    var disqus_shortname = "zhangshuyang";
-//    var disqus_identifier = "/2018/02/19/my-first-blog";
-//    var disqus_url = "http://localhost:4000/2018/02/19/my-first-blog/";
+//    var disqus_identifier = "/2018/02/20/add-https-using-letsencrypt";
+//    var disqus_url = "http://localhost:4000/2018/02/20/add-https-using-letsencrypt/";
 //
 //    (function() {
 //        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
@@ -271,8 +397,8 @@
 //       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 //    })();
         var disqus_config = function () {
-        this.page.url = "http://localhost:4000/2018/02/19/my-first-blog/";  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = "/2018/02/19/my-first-blog"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.url = "http://localhost:4000/2018/02/20/add-https-using-letsencrypt/";  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = "/2018/02/20/add-https-using-letsencrypt"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
 
         (function() { // DON'T EDIT BELOW THIS LINE
