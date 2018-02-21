@@ -6,9 +6,9 @@ date:       2018-02-19 19:12:00
 author:     "Zhang Shuyang"
 header-img: "img/post-bg-2015.jpg"
 tags:
-    - Linux
-    - Arch
-    - ArchLinux
+    - linux
+    - arch
+    - archlinux
 ---
 
 #### 0.前言

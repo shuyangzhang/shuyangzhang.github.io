@@ -9,7 +9,7 @@ tags:
     - https
     - nginx
     - LNMP
-    - Linux
+    - linux
 ---
 
 
