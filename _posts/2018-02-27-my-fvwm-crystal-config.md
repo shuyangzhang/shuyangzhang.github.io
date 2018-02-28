@@ -25,11 +25,11 @@ archlinux一直是最简洁但又定制性最强的linux发行版，其自身避
 
 #### emacs类输入习惯
 
-由于fvwm-crstal的作者是一个vim用户，所以在设计的时候并没有考虑emacs用户的输入习惯。虽然我也是一个vim粉丝，但是有些emacs类的操作还是很方便的，比如在terminal中使用alt+b，alt+f进行以单词为单位的光标回退与前进，是非常高效的，但是fvwm-crystal自身在alt与其他字母键上绑定了很多功能导致该功能失效。
+由于fvwm-crystal的作者是一个vim用户，所以在设计的时候并没有考虑emacs用户的输入习惯。虽然我也是一个vim粉丝，但是有些emacs类的操作还是很方便的，比如在terminal中使用alt+b，alt+f进行以单词为单位的光标回退与前进，是非常高效的，但是fvwm-crystal自身在alt与其他字母键上绑定了很多功能导致该功能失效。
 fvwm-crystal作者已经考虑到了这个问题，并且在FAQ中提供了解决方案，就是在preferences->key binding modifiers editor中，将Mod1 改为 4（即left windows），将SelectOnRelease改为Super_L(也是left windows)就行，这么改我尝试过，的确可以，但是等于将所有的alt快捷键全部挪到了windows键上，这个其实我可以适应，但是有一个小bug，就是在切换窗口时，本来的热键是alt+tab，现在变成了windows+tab，在松开windows键后并不能自动切换到选择的窗口，需要再点击一次，这个bug我在google上搜了很久，自己也尝试了很多种方法都未能解决，但是只要改回alt键，就没问题了，很奇怪，但是改回alt后，emacs类的操作习惯就无法被满足，最后的解决方案是，直接在fvwm的全局keybinding设置中将alt+b,alt+f等常用热键解绑，完美解决此问题。
 具体方法是修改 ~/.fvwm-crystal/userconfig 文件，在其中加入两行
 
-`Key F A M -`
+`Key F A M -`  
 `Key B A M -`
 
 之前我尝试在 ~/.fvwm-crystal/preferences/CustomKeyModifiers 中修改并没有用，应该是配置文件优先级的问题。
